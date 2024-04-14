@@ -1,12 +1,11 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+import os
 import time
-from bs4 import BeautifulSoup
 import json
 import csv
-import os
+from selenium import webdriver
+from bs4 import BeautifulSoup
 
-def getSearchResults(query: str) -> list:
+def getSearchResults(query: str) -> BeautifulSoup:
     driver = webdriver.Chrome()
 
     # Abrir la URL en el navegador
@@ -31,12 +30,11 @@ def getSearchResults(query: str) -> list:
 
     # Parsear el HTML utilizando BeautifulSoup
     soup = BeautifulSoup(html, "html.parser")
-    soup.findAll("a")
     return soup
 
 def create_search_results_folder():
-    if not os.path.exists(".gitignore/searchResults"):
-        os.makedirs(".gitignore/searchResults")
+    if not os.path.exists("secretStuff/searchResults"):
+        os.makedirs("secretStuff/searchResults")
 
 def writeSearchResultsJSON(query: str):
     create_search_results_folder()
@@ -49,7 +47,7 @@ def writeSearchResultsJSON(query: str):
         if href.startswith("https://"):
             output_data["urlNoticias"].append(href)
     # Escribimos en un JSON
-    with open(".gitignore/searchResults/output.json", "w", encoding="utf-8") as file:
+    with open("secretStuff/searchResults/output.json", "w", encoding="utf-8") as file:
         json.dump(output_data, file, ensure_ascii=False, indent=4)
 
 
@@ -58,7 +56,7 @@ def writeSearchResultsCSV(query: str):
     soup = getSearchResults(query)
     # Encontramos todos los contenedores con hrefs
     # Se abre primero el archivo para no estar abriendolo y cerrandolo pq vamos a escribir varias veces en el
-    with open(".gitignore/searchResults/output.csv", "w", encoding="utf-8") as file:
+    with open("secretStuff/searchResults/output.csv", "w", encoding="utf-8") as file:
         results = soup.find_all("a")
         for element in results:
             href = str(element.get("href"))
@@ -69,7 +67,7 @@ def writeSearchResultsCSV(query: str):
 def defaultJSON():
     create_search_results_folder()
     # Crea un archivo JSON vacío
-    with open(".gitignore/searchResults/output.json", "w", encoding="utf-8") as file:
+    with open("secretStuff/searchResults/output.json", "w", encoding="utf-8") as file:
         json.dump({}, file)
 
 
@@ -77,14 +75,7 @@ def defaultCSV():
     create_search_results_folder()
     # Crea un archivo CSV vacío con encabezados
     with open(
-        ".gitignore/searchResults/output.csv", "w", newline="", encoding="utf-8"
+        "secretStuff/searchResults/output.csv", "w", newline="", encoding="utf-8"
     ) as file:
         writer = csv.writer(file)
         writer.writerow(["url"])  # Encabezado
-
-
-def main():
-    writeSearchResultsJSON('Clima')
-
-if __name__ == "__main__":
-    main()
