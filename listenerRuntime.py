@@ -2,7 +2,7 @@ import schedule
 import time
 
 def tarea():
-    print("¡Esta es tu tarea ejecutándose cada minuto!")
+    print("¡Hola")
 
 # Programa la tarea para que se ejecute cada minuto
 schedule.every(1).minutes.do(tarea)
