@@ -98,13 +98,21 @@ def defaultCSV():
         writer = csv.writer(file)
         writer.writerow(["url"])  # Encabezado
 
+def eliminateDuplicatesCSV(fileName: str):
+    with open(fileName, 'r+') as file:
+        lines = file.readlines()
+        file.seek(0)
+        seen = set()
+        for line in lines:
+            if line not in seen:
+                seen.add(line)
+                file.write(line)
+        file.truncate()
+
 
 def main():
     # Más que nada pruebas 
-    defaultJSON()
-    defaultCSV()
-    
-
+    eliminateDuplicatesCSV('output\searchResults\searchResults.csv')
 
 if __name__ == "__main__":
     main()
