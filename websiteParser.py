@@ -3,7 +3,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 from bs4 import BeautifulSoup
 
-def parse_html_lazy_loading(url):
+def parseHTML(url):
     driver = webdriver.Chrome()
     
     # Abrir la URL en el navegador
@@ -33,7 +33,7 @@ def parse_html_lazy_loading(url):
 def main():
 
     url = "https://www.ambasmanos.mx/nota-roja/capturan-a-cuatro-integrantes-de-los-monstruos-banda-dedicada-al-robo-de-camiones-de-carga/165105/"
-    parsed_html = parse_html_lazy_loading(url)
+    parsed_html = parseHTML(url)
     # Encontramos todos los contenedores con parrafos
     all_Paragraphs = parsed_html.find_all("p")
     

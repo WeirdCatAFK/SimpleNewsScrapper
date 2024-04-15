@@ -35,8 +35,8 @@ def getSearchResults(query: str) -> BeautifulSoup:
 
 
 def checkOrCreate_SystemFolders():
-    if not os.path.exists("secretStuff/searchResults"):
-        os.makedirs("secretStuff/searchResults")
+    if not os.path.exists("output/searchResults"):
+        os.makedirs("output/searchResults")
 
 
 def writeSearchResultsJSON(query: str):
@@ -54,7 +54,7 @@ def writeSearchResultsJSON(query: str):
     # Leemos el archivo JSON existente, si existe
     try:
         with open(
-            "secretStuff/searchResults/output.json", "r", encoding="utf-8"
+            "output/searchResults/searchResults.json", "r", encoding="utf-8"
         ) as file:
             existing_data = json.load(file)
     except FileNotFoundError:
@@ -64,7 +64,7 @@ def writeSearchResultsJSON(query: str):
     existing_data["urlNoticias"].extend(output_data["urlNoticias"])
 
     # Escribimos el diccionario actualizado en el JSON
-    with open("secretStuff/searchResults/output.json", "w", encoding="utf-8") as file:
+    with open("output/searchResults/searchResults.json", "w", encoding="utf-8") as file:
         json.dump(existing_data, file, ensure_ascii=False, indent=4)
 
 
@@ -73,7 +73,7 @@ def writeSearchResultsCSV(query: str):
     soup = getSearchResults(query)
     # Encontramos todos los contenedores con hrefs
     # Se abre primero el archivo para no estar abriendolo y cerrandolo pq vamos a escribir varias veces en el
-    with open("secretStuff/searchResults/output.csv", "a", encoding="utf-8") as file:
+    with open("output/searchResults/searchResults.csv", "a", encoding="utf-8") as file:
         results = soup.find_all("a")
         for element in results:
             href = str(element.get("href"))
@@ -85,7 +85,7 @@ def defaultJSON():
     checkOrCreate_SystemFolders()
     defaultJSON = { "results" : None}
     # Crea un archivo JSON vacío
-    with open("secretStuff/searchResults/output.json", "w", encoding="utf-8") as file:
+    with open("output/searchResults/searchResults.json", "w", encoding="utf-8") as file:
         json.dump(defaultJSON, file)
 
 
@@ -93,7 +93,7 @@ def defaultCSV():
     checkOrCreate_SystemFolders()
     # Crea un archivo CSV vacío con encabezados
     with open(
-        "secretStuff/searchResults/output.csv", "w", newline="", encoding="utf-8"
+        "output/searchResults/searchResults.csv", "w", newline="", encoding="utf-8"
     ) as file:
         writer = csv.writer(file)
         writer.writerow(["url"])  # Encabezado
@@ -102,6 +102,7 @@ def defaultCSV():
 def main():
     # Más que nada pruebas 
     defaultJSON()
+    defaultCSV()
     
 
 
