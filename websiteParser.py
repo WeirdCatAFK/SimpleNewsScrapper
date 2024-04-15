@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 from bs4 import BeautifulSoup
+import csv
 
 
 def getHtmlText(url):
@@ -14,7 +15,7 @@ def getHtmlText(url):
     lastHeight = driver.execute_script("return document.body.scrollHeight")
     while True:
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(6)  # Esperar a que se cargue el contenido
+        time.sleep(3)  # Esperar a que se cargue el contenido
         new_height = driver.execute_script("return document.body.scrollHeight")
         
         if new_height == lastHeight:
@@ -34,13 +35,16 @@ def getHtmlText(url):
 
     return output
 
+def writeToCSV(urls : list, filename: str):
+    with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['URL', 'Text'])
+        for url in urls:
+            text = getHtmlText(url)
+            writer.writerow([url, text])
 
 def main():
-    print(
-        getHtmlText(
-            "https://www.abc.es/cultura/musica/instrumentos-musicales/"
-        )
-    )
+    print("Hola mundo")
 
 
 if __name__ == "__main__":

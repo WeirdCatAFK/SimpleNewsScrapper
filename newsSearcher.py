@@ -34,12 +34,21 @@ def getSearchResults(query: str) -> BeautifulSoup:
     return soup
 
 
-def checkOrCreate_SystemFolders():
-    if not os.path.exists("output/searchResults"):
-        os.makedirs("output/searchResults")
 
 
-def writeSearchResultsJSON(query: str):
+
+def checkOrCreate_SystemFolders(pathName: str = "output/searchResults"):
+    if not os.path.exists(pathName):
+        os.makedirs(pathName)
+
+
+
+
+
+
+def writeSearchResultsJSON(
+    query: str, outPath="output/searchResults/searchResults.json"
+):
     checkOrCreate_SystemFolders()
     soup = getSearchResults(query)
 
@@ -53,9 +62,7 @@ def writeSearchResultsJSON(query: str):
 
     # Leemos el archivo JSON existente, si existe
     try:
-        with open(
-            "output/searchResults/searchResults.json", "r", encoding="utf-8"
-        ) as file:
+        with open(outPath, "r", encoding="utf-8") as file:
             existing_data = json.load(file)
     except FileNotFoundError:
         existing_data = {"urlNoticias": []}
@@ -64,42 +71,47 @@ def writeSearchResultsJSON(query: str):
     existing_data["urlNoticias"].extend(output_data["urlNoticias"])
 
     # Escribimos el diccionario actualizado en el JSON
-    with open("output/searchResults/searchResults.json", "w", encoding="utf-8") as file:
+    with open(outPath, "w", encoding="utf-8") as file:
         json.dump(existing_data, file, ensure_ascii=False, indent=4)
 
 
-def writeSearchResultsCSV(query: str):
+
+
+
+
+
+def writeSearchResultsCSV(query: str, outPath = "output/searchResults/searchResults.csv"):
     checkOrCreate_SystemFolders()
     soup = getSearchResults(query)
     # Encontramos todos los contenedores con hrefs
     # Se abre primero el archivo para no estar abriendolo y cerrandolo pq vamos a escribir varias veces en el
-    with open("output/searchResults/searchResults.csv", "a", encoding="utf-8") as file:
+    with open(outPath, "a", encoding="utf-8") as file:
         results = soup.find_all("a")
         for element in results:
             href = str(element.get("href"))
             if href.startswith("https://"):
-                file.write(href + ",\n")
+                file.write(href + "\n")
 
 
-def defaultJSON():
+def defaultJSON(outPath ="output/searchResults/searchResults.json"):
     checkOrCreate_SystemFolders()
-    defaultJSON = { "results" : None}
+    defaultJSON = {"results": None}
     # Crea un archivo JSON vacío
-    with open("output/searchResults/searchResults.json", "w", encoding="utf-8") as file:
+    with open(outPath, "w", encoding="utf-8") as file:
         json.dump(defaultJSON, file)
 
 
-def defaultCSV():
+def defaultCSV(outPath ="output/searchResults/searchResults.csv"):
     checkOrCreate_SystemFolders()
     # Crea un archivo CSV vacío con encabezados
     with open(
-        "output/searchResults/searchResults.csv", "w", newline="", encoding="utf-8"
+        outPath, "w", newline="", encoding="utf-8"
     ) as file:
         writer = csv.writer(file)
-        writer.writerow(["url"])  # Encabezado
+
 
 def eliminateDuplicatesCSV(fileName: str):
-    with open(fileName, 'r+') as file:
+    with open(fileName, "r+") as file:
         lines = file.readlines()
         file.seek(0)
         seen = set()
@@ -111,8 +123,9 @@ def eliminateDuplicatesCSV(fileName: str):
 
 
 def main():
-    # Más que nada pruebas 
-    eliminateDuplicatesCSV('output\searchResults\searchResults.csv')
+    # Más que nada pruebas
+    eliminateDuplicatesCSV("output\searchResults\searchResults.csv")
+
 
 if __name__ == "__main__":
     main()
