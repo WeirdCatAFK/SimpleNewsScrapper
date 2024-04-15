@@ -1,51 +1,73 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import WebDriverException, TimeoutException
 import time
+import random
 from bs4 import BeautifulSoup
 import csv
 
 
+def deleteNewLines(text):
+    return text.replace("\n", "")
+
+
+filterClasses = ["kicker-aside-back", "kicker"]
+
+
 def getHtmlText(url):
-    driver = webdriver.Chrome()
+    try:
+        driver = webdriver.Chrome()
 
-    # Abrir la URL en el navegador
-    driver.get(url)
+        # Configurar el tiempo máximo de espera para cargar la página
+        driver.set_page_load_timeout(10)
 
-    # Simular el desplazamiento para cargar todo el contenido
-    lastHeight = driver.execute_script("return document.body.scrollHeight")
-    while True:
-        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(3)  # Esperar a que se cargue el contenido
-        new_height = driver.execute_script("return document.body.scrollHeight")
+        # Abrir la URL en el navegador
+        driver.get(url)
+
+        # Simular el desplazamiento para cargar todo el contenido
+        lastHeight = driver.execute_script("return document.body.scrollHeight")
+        while True:
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            # Agregar retraso aleatorio entre 1 y 3 segundos antes de desplazarse nuevamente
+            time.sleep(random.uniform(1, 3))
+            newHeight = driver.execute_script("return document.body.scrollHeight")
+            
+            if newHeight == lastHeight:
+                break
+            lastHeight = newHeight
         
-        if new_height == lastHeight:
-            break
-        lastHeight = new_height
+        # Obtener el HTML de la página después de cargar todo el contenido
+        html = driver.page_source
+        
+        # Parsear el HTML a un soup de bs4
+        soup = BeautifulSoup(html, "html.parser")
+        
+        # Data filtering
+        output = ""
+        paragraphs = []
+        for tag in soup.find_all(["p"]):
+            
+            if tag.parent.name not in ['head', 'script'] and not any(cls in tag.get('class', []) for cls in filterClasses):  # Exclude <head>, <script>, and elements with specific classes
+                paragraphs.append(deleteNewLines(str(tag.text)))
+        #Data processing 
+        for tag in paragraphs[0:20]:
+            
+            if tag.parent.name not in ['head', 'script'] and not any(cls in tag.get('class', []) for cls in filterClasses):  # Exclude <head>, <script>, and elements with specific classes
+                output += deleteNewLines(str(tag.text)) + " "
+        print(output)
+        
+        
+        return output
     
-    # Obtener el HTML de la página después de cargar todo el contenido
-    html = driver.page_source
-    driver.quit()
-    # Parsear el HTML utilizando BeautifulSoup
-    soup = BeautifulSoup(html, "html.parser")
-    # Encontramos todos los contenedores con parrafos
-    all_Paragraphs = soup.find_all("p")
-    output = ""
-    for paragraph in all_Paragraphs:
-        output += str(paragraph.text) + " "
+    except (WebDriverException, TimeoutException) as e:
+        print("Error:", e)
+        return ""
 
-    return output
 
-def writeToCSV(urls : list, filename: str):
-    with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
+def writeToCSV(urls: list, filename: str):
+    with open(filename, "w", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['URL', 'Text'])
+        writer.writerow(["URL", "Text"])
         for url in urls:
             text = getHtmlText(url)
             writer.writerow([url, text])
-
-def main():
-    print("Hola mundo")
-
-
-if __name__ == "__main__":
-    main()
