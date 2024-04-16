@@ -2,23 +2,20 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from bs4 import BeautifulSoup
-import csv, os, random, time
+import csv, random, time
 
 def deleteNewLines(text):
     return text.replace("\n", "")
 
 
 filterClasses = ["kicker-aside-back", "kicker"]
-def checkOrCreate_SystemFolders(pathName: str = "output/searchResults"):
-    if not os.path.exists(pathName):
-        os.makedirs(pathName)
 
 def getHtmlText(url):
     try:
         driver = webdriver.Firefox()
 
         # Configurar el tiempo máximo de espera para cargar la página
-        driver.set_page_load_timeout(10)
+        driver.set_page_load_timeout(5)
 
         # Abrir la URL en el navegador
         driver.get(url)
@@ -51,20 +48,20 @@ def getHtmlText(url):
         #Data processing 
         for tag in paragraphs[0:20]:    
             output += deleteNewLines(tag) + " "
+        driver.quit()
         print(output)
-        return output[0:500]
+        return output
     
     except (WebDriverException, TimeoutException) as e:
+        driver.quit()
         print("Error:", e)
         return ""
 
 
 def writeToCSV(urls: list, filename: str):
-    file_exists = os.path.exists(filename)
     with open(filename, "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
-        if not file_exists:
-            writer.writerow(["URL", "Text"])
+        writer.writerow(['URL', 'Text'])
         for url in urls:
             text = getHtmlText(url)
             writer.writerow([url, text])
