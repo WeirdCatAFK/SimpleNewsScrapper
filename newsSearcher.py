@@ -75,11 +75,6 @@ def writeSearchResultsJSON(
         json.dump(existing_data, file, ensure_ascii=False, indent=4)
 
 
-
-
-
-
-
 def writeSearchResultsCSV(query: str, outPath = "output/searchResults/searchResults.csv"):
     checkOrCreate_SystemFolders()
     soup = getSearchResults(query)

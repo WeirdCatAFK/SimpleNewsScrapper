@@ -1,22 +1,21 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException, TimeoutException
-import time
-import random
 from bs4 import BeautifulSoup
-import csv
-
+import csv, os, random, time
 
 def deleteNewLines(text):
     return text.replace("\n", "")
 
 
 filterClasses = ["kicker-aside-back", "kicker"]
-
+def checkOrCreate_SystemFolders(pathName: str = "output/searchResults"):
+    if not os.path.exists(pathName):
+        os.makedirs(pathName)
 
 def getHtmlText(url):
     try:
-        driver = webdriver.Chrome()
+        driver = webdriver.Firefox()
 
         # Configurar el tiempo máximo de espera para cargar la página
         driver.set_page_load_timeout(10)
@@ -50,14 +49,10 @@ def getHtmlText(url):
             if tag.parent.name not in ['head', 'script'] and not any(cls in tag.get('class', []) for cls in filterClasses):  # Exclude <head>, <script>, and elements with specific classes
                 paragraphs.append(deleteNewLines(str(tag.text)))
         #Data processing 
-        for tag in paragraphs[0:20]:
-            
-            if tag.parent.name not in ['head', 'script'] and not any(cls in tag.get('class', []) for cls in filterClasses):  # Exclude <head>, <script>, and elements with specific classes
-                output += deleteNewLines(str(tag.text)) + " "
+        for tag in paragraphs[0:20]:    
+            output += deleteNewLines(tag) + " "
         print(output)
-        
-        
-        return output
+        return output[0:500]
     
     except (WebDriverException, TimeoutException) as e:
         print("Error:", e)
@@ -65,9 +60,11 @@ def getHtmlText(url):
 
 
 def writeToCSV(urls: list, filename: str):
-    with open(filename, "w", newline="", encoding="utf-8") as csvfile:
+    file_exists = os.path.exists(filename)
+    with open(filename, "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(["URL", "Text"])
+        if not file_exists:
+            writer.writerow(["URL", "Text"])
         for url in urls:
             text = getHtmlText(url)
             writer.writerow([url, text])

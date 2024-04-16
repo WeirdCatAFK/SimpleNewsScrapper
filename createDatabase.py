@@ -4,11 +4,10 @@ import csv
 
 
 def main():
-    
     newsSearcher.defaultCSV()
     # Las queries con las que buscaremos nuestras noticias
     searchQueries = [
-        "Premios escolares en",
+        "Precio gasolina",
     ]
     # Normalizamos el archivo donde se generan los resultados
     newsSearcher.defaultCSV()
