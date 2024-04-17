@@ -7,7 +7,7 @@ import random, time, sqlite3, re
 
 filterClasses = ["kicker-aside-back", "kicker"]
 
-driver_path = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
+driver_path = r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
 
 def depurer(text):
     # Function to remove newlines
@@ -33,8 +33,7 @@ def getHtmlText(url):
         option = webdriver.ChromeOptions()
 
         option.binary_location = brave_path
-
-        driver = webdriver.Chrome(executable_path=driver_path, chrome_options=option)
+        driver = webdriver.Chrome(options = option)
 
 
         # Configurar el tiempo máximo de espera para cargar la página
