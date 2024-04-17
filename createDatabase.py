@@ -9,7 +9,7 @@ def main():
     print(f'database {database} created successfully')
     
     # Determine our queries
-    search_queries = [ ... ]  # Your list of search queries
+    search_queries = ['La guerra de Israel afectara el precio de la tortilla']  # Your list of search queries
     
     # Initialize an empty list to store all news
     all_the_news = []
