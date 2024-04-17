@@ -47,22 +47,23 @@ def getHtmlText(url):
             if newHeight == lastHeight or (now - start) >= 20:
                 break
             lastHeight = newHeight
-        html = driver.page_source
-        # Parsear el HTML a un soup de bs4
-        soup = BeautifulSoup(html, "html.parser")
+
+        # Parsear el HTML a un soup de bs4 directamente desde el navegador
+        soup = BeautifulSoup(driver.page_source, "html.parser")
 
         # Data filtering
         output = ""
         paragraphs = []
         for tag in soup.find_all(["p"]):
-
             if tag.parent.name not in ["head", "script"] and not any(
                 cls in tag.get("class", []) for cls in filterClasses
             ):  # Exclude <head>, <script>, and elements with specific classes
                 paragraphs.append(depurer(str(tag.text)))
+
         # Data processing
         for tag in paragraphs[0:20]:
             output += depurer(tag) + " "
+
         driver.quit()
         return output
 

@@ -3,7 +3,7 @@ from selenium import webdriver
 from bs4 import BeautifulSoup
 
 
-def getSearchResults(query: str) -> BeautifulSoup:
+def getSearchResults(query: str) -> list:
     driver = webdriver.Firefox()
 
     # Abrir la URL en el navegador
@@ -21,21 +21,17 @@ def getSearchResults(query: str) -> BeautifulSoup:
         last_height = new_height
 
     # Obtener el HTML de la página después de cargar todo el contenido
-    html = driver.page_source
+    soup = BeautifulSoup(driver.page_source, "html.parser")
 
     # Cerrar el navegador
     driver.quit()
 
-    # Parsear el HTML utilizando BeautifulSoup
-    soup = BeautifulSoup(html, "html.parser")
-    
-    link = soup.find_all('a')
-    results =[]
-    for element in link:
-        href = str(element.get("href"))
-        if href.startswith("https://"):
-            results.append(str(href))
+    # Encontrar todos los enlaces y filtrar solo los que comienzan con "https://"
+    links = soup.find_all('a')
+    results = [str(link.get("href")) for link in links if str(link.get("href")).startswith("https://")]
+
     return results
+
     
 def writeResultsToDatabase(sqliteDB_Path: str, tableName: str, data: list):
     connection = sqlite3.connect(sqliteDB_Path)
