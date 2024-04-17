@@ -1,13 +1,10 @@
-import os
-import time
-import json
-import csv
+import time, sqlite3
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
 
 def getSearchResults(query: str) -> BeautifulSoup:
-    driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
 
     # Abrir la URL en el navegador
     driver.get("https://www.bing.com/news/search?q=" + query)
@@ -31,96 +28,48 @@ def getSearchResults(query: str) -> BeautifulSoup:
 
     # Parsear el HTML utilizando BeautifulSoup
     soup = BeautifulSoup(html, "html.parser")
-    return soup
-
-
-
-
-
-def checkOrCreate_SystemFolders(pathName: str = "output/searchResults"):
-    if not os.path.exists(pathName):
-        os.makedirs(pathName)
-
-
-
-
-
-
-def writeSearchResultsJSON(
-    query: str, outPath="output/searchResults/searchResults.json"
-):
-    checkOrCreate_SystemFolders()
-    soup = getSearchResults(query)
-
-    # Encontramos todos los contenedores con hrefs y guardamos todos los valores en un diccionario
-    results = soup.find_all("a")
-    output_data = {"urlNoticias": []}
-    for element in results:
+    
+    link = soup.find_all('a')
+    results =[]
+    for element in link:
         href = str(element.get("href"))
         if href.startswith("https://"):
-            output_data["urlNoticias"].append(href)
+            results.append(str(href))
+    return results
+    
+def writeResultsToDatabase(sqliteDB_Path: str, tableName: str, data: list):
+    connection = sqlite3.connect(sqliteDB_Path)
+    cursor = connection.cursor()
+    
+    cursor.execute("DROP TABLE IF EXISTS " + tableName + ";")
+    cursor.execute(f"CREATE TABLE \"{tableName}\" (\n"
+                   "\t\"id\" INTEGER NOT NULL UNIQUE,\n"
+                   "\t\"urls\" TEXT UNIQUE,\n"
+                   "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n"
+                   ");")
+    
+    for content in data:
+        # Verificar si el contenido ya existe en la tabla
+        cursor.execute(f"SELECT urls FROM {tableName} WHERE urls = ?", (content,))
+        existing_data = cursor.fetchone()
+        if existing_data:
+            print(f"El dato '{content}' ya existe en la tabla. No se insertará nuevamente.")
+        else:
+            cursor.execute(f"INSERT INTO {tableName}(urls) VALUES (?)", (content,))
+            print(f"El dato '{content}' se inserto exitosamente a la base de datos.")
 
-    # Leemos el archivo JSON existente, si existe
-    try:
-        with open(outPath, "r", encoding="utf-8") as file:
-            existing_data = json.load(file)
-    except FileNotFoundError:
-        existing_data = {"urlNoticias": []}
+    
+    connection.commit()
+    connection.close()
+def getResultsFromDatabase(sqliteDB_Path: str, tableName: str):
+    import sqlite3
+    
+    connection = sqlite3.connect(sqliteDB_Path)
+    cursor = connection.cursor()
 
-    # Agregamos los nuevos datos al diccionario existente
-    existing_data["urlNoticias"].extend(output_data["urlNoticias"])
+    cursor.execute(f"SELECT * FROM {tableName};")
+    results = cursor.fetchall()
 
-    # Escribimos el diccionario actualizado en el JSON
-    with open(outPath, "w", encoding="utf-8") as file:
-        json.dump(existing_data, file, ensure_ascii=False, indent=4)
+    connection.close()
 
-
-def writeSearchResultsCSV(query: str, outPath = "output/searchResults/searchResults.csv"):
-    checkOrCreate_SystemFolders()
-    soup = getSearchResults(query)
-    # Encontramos todos los contenedores con hrefs
-    # Se abre primero el archivo para no estar abriendolo y cerrandolo pq vamos a escribir varias veces en el
-    with open(outPath, "a", encoding="utf-8") as file:
-        results = soup.find_all("a")
-        for element in results:
-            href = str(element.get("href"))
-            if href.startswith("https://"):
-                file.write(href + "\n")
-
-
-def defaultJSON(outPath ="output/searchResults/searchResults.json"):
-    checkOrCreate_SystemFolders()
-    defaultJSON = {"results": None}
-    # Crea un archivo JSON vacío
-    with open(outPath, "w", encoding="utf-8") as file:
-        json.dump(defaultJSON, file)
-
-
-def defaultCSV(outPath ="output/searchResults/searchResults.csv"):
-    checkOrCreate_SystemFolders()
-    # Crea un archivo CSV vacío con encabezados
-    with open(
-        outPath, "w", newline="", encoding="utf-8"
-    ) as file:
-        writer = csv.writer(file)
-
-
-def eliminateDuplicatesCSV(fileName: str):
-    with open(fileName, "r+") as file:
-        lines = file.readlines()
-        file.seek(0)
-        seen = set()
-        for line in lines:
-            if line not in seen:
-                seen.add(line)
-                file.write(line)
-        file.truncate()
-
-
-def main():
-    # Más que nada pruebas
-    eliminateDuplicatesCSV("output\searchResults\searchResults.csv")
-
-
-if __name__ == "__main__":
-    main()
+    return results

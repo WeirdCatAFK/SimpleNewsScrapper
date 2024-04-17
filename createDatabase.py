@@ -1,33 +1,28 @@
-import newsSearcher
-import websiteParser
-import csv
+import newsSearcher, webScrapper, os
 
 
 def main():
-    news = []
-    newsSearcher.defaultCSV()
-    # Las queries con las que buscaremos nuestras news
-    searchQueries = [
-        "Asalto de camiones en",
-    ]
-    # Normalizamos el archivo donde se generan los resultados
-    newsSearcher.defaultCSV()
-
-    # Conseguimos las news
-    for querie in searchQueries:
-        newsSearcher.writeSearchResultsCSV(querie)
-
-    # Eliminamos los duplicados
-    newsSearcher.eliminateDuplicatesCSV("output/searchResults/searchResults.csv")
+    database = 'data.db'
+    if not os.path.exists(database):
+        with open(database,'w') as f:
+            pass
+    print(f'database {database} created sucessfully')
     
-    # Abre el archivo CSV en modo lectura
-    with open("output/searchResults/searchResults.csv", newline="") as csvfile:
-        datosCSV = csv.reader(csvfile)
-        for linea in datosCSV:
-            news.append(str(linea[0]))
-            print(linea[0])
-            
-    websiteParser.writeToCSV(news, "output/content.csv")
+    #Conseguimos los datos de las noticias
+    news = newsSearcher.getSearchResults('Ataques Israel')
+    #Escribimos los resultados a la base de datos
+    newsSearcher.writeResultsToDatabase(database,'searchResults',news)
+    #Confirmamos que los datos estan en la base de datos
+    urls = newsSearcher.getResultsFromDatabase(database,'searchResults')
+    
+
+    #Creamos la base de datos para el contenido de las noticias
+    webScrapper.createDB(database,'content')
+    #Insertamos las noticias a la base de datos
+    for new in news:
+        print (f"retrieved {new} from database")
+    
+    webScrapper.writeTextToDB(database,'content',webScrapper.getHtmlText(str(new[1])))
 
 if __name__ == "__main__":
     main()

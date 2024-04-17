@@ -1,11 +1,9 @@
 # Ignore the output directory and its contents
-output/
-
+data.db
 # Ignore the specific files
 test.py
 __pycache__
 
 # Ignore specific files inside the output directory
-output/searchResults/searchResults.csv
-output/searchResults/content.csv
-output/searchResults/searchResults.json
+
+
