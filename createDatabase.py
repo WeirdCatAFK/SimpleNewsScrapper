@@ -28,6 +28,9 @@ def main():
         # Write the current batch of news URLs to the database
         newsSearcher.writeResultsToDatabase(database, 'searchResults', news_urls)
         
+        #Create the table where we will store our content
+        webScrapper.createDB(database,'content')
+        
         # Process news URLs in batches
         for i in range(0, len(news_urls), batch_size):
             batch_urls = news_urls[i:i + batch_size]
