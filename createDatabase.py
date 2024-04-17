@@ -9,7 +9,7 @@ def main():
     print(f'database {database} created successfully')
     
     # Determine our queries
-    search_queries = ['La guerra de Israel afectara el precio de la tortilla']  # Your list of search queries
+    search_queries = [ ... ]  # Your list of search queries
     
     # Initialize an empty list to store all news
     all_the_news = []
@@ -27,6 +27,9 @@ def main():
         
         # Write the current batch of news URLs to the database
         newsSearcher.writeResultsToDatabase(database, 'searchResults', news_urls)
+        
+        #Create the table where we will store our content
+        webScrapper.createDB(database,'content')
         
         # Process news URLs in batches
         for i in range(0, len(news_urls), batch_size):
