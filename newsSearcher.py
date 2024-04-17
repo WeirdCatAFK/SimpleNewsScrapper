@@ -24,14 +24,31 @@ def getSearchResults(query: str) -> list:
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)  # Esperar a que se cargue el contenido
             new_height = driver.execute_script("return document.body.scrollHeight")
+        # Simular el desplazamiento para cargar todo el contenido
+        last_height = driver.execute_script("return document.body.scrollHeight")
+        while True:
+            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(2)  # Esperar a que se cargue el contenido
+            new_height = driver.execute_script("return document.body.scrollHeight")
 
+            if new_height == last_height:
+                break
+            last_height = new_height
             if new_height == last_height:
                 break
             last_height = new_height
 
         # Obtener el HTML de la página después de cargar todo el contenido
         soup = BeautifulSoup(driver.page_source, "html.parser")
+        # Obtener el HTML de la página después de cargar todo el contenido
+        soup = BeautifulSoup(driver.page_source, "html.parser")
 
+        # Encontrar todos los enlaces y filtrar solo los que comienzan con "https://"
+        links = soup.find_all('a')
+        results = [str(link.get("href")) for link in links if str(link.get("href")).startswith("https://")]
+    finally:
+        # Cerrar el navegador
+        driver.quit()
         # Encontrar todos los enlaces y filtrar solo los que comienzan con "https://"
         links = soup.find_all('a')
         results = [str(link.get("href")) for link in links if str(link.get("href")).startswith("https://")]
@@ -52,6 +69,31 @@ def writeResultsToDatabase(sqliteDB_Path: str, tableName: str, data: list):
                    "\t\"urls\" TEXT UNIQUE,\n"
                    "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n"
                    ");")
+    
+    try:
+        # Iniciar transacción
+        cursor.execute("BEGIN TRANSACTION;")
+        
+        for content in data:
+            # Verificar si el contenido ya existe en la tabla
+            cursor.execute(f"SELECT COUNT(*) FROM {tableName} WHERE urls = ?", (content,))
+            existing_count = cursor.fetchone()[0]
+            if existing_count > 0:
+                print(f"El dato '{content}' ya existe en la tabla. No se insertará nuevamente.")
+            else:
+                cursor.execute(f"INSERT INTO {tableName}(urls) VALUES (?)", (content,))
+                print(f"El dato '{content}' se inserto exitosamente a la base de datos.")
+        
+        # Finalizar transacción
+        connection.commit()
+    except Exception as e:
+        # Revertir la transacción en caso de error
+        print("Error:", e)
+        connection.rollback()
+    finally:
+        connection.close()
+        
+        
     
     try:
         # Iniciar transacción
