@@ -18,7 +18,7 @@ def main():
     newsSearcher.writeResultsToDatabase(database, 'searchResults', [])
     
     # Batch size for fetching news URLs
-    batch_size = 10
+    batch_size = 5
     
     # Fetch news URLs for each query and process them in batches
     for query in search_queries:
@@ -35,7 +35,7 @@ def main():
             for news_url in batch_urls:
                 print(f"Retrieving {news_url} from database")
                 # Fetch and write the content of the current news URL to the database
-                webScrapper.writeTextToDB(database, 'content', webScrapper.getHtmlText(str(news_url)))
+                webScrapper.writeTextToDB(database, 'content',str(news_url), webScrapper.getHtmlText(str(news_url)))
                 # Append the news URL to the list of all news
                 all_the_news.append(news_url)
     

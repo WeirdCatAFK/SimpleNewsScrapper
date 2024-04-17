@@ -85,7 +85,7 @@ def createDB(sqliteDB_Path: str, tableName: str):
     connection.close()
 
 
-def writeTextToDB(sqliteDB_Path: str, tableName: str, entryText: str):
+def writeTextToDB(sqliteDB_Path: str, tableName: str, url: str, entryText: str):
     connection = sqlite3.connect(sqliteDB_Path)
     cursor = connection.cursor()
 
@@ -98,7 +98,7 @@ def writeTextToDB(sqliteDB_Path: str, tableName: str, entryText: str):
         )
     else:
         cursor.execute(
-            f"INSERT INTO {tableName} (url, text) VALUES (?, ?)", (None, entryText)
+            f"INSERT INTO {tableName} (url, text) VALUES (?, ?)", (url, entryText)
         )
         print(f"El dato '{entryText}' se inserto exitosamente a la base de datos.")
 
