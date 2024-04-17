@@ -2,9 +2,9 @@ import newsSearcher
 import webScrapper
 import os
 
-
-
 def main():
+    newsSearcher.set_DriverPath(r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe") #Tu path de tu ejecutable de brave
+    newsSearcher.set_DriverPath(r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe") #Tu path de tu ejecutable de brave
     database = 'data.db'
     if not os.path.exists(database):
         with open(database,'w'):
@@ -27,9 +27,7 @@ def main():
         
         # Write the current batch of news URLs to the database
         newsSearcher.writeResultsToDatabase(database, 'searchResults', news_urls)
-
-       #Distributing the data onto manejable sizes
-        newsSearcher.distributeDataEqually(database,'searchResults', 3)     
+  
     # Create the table where we will store our content
     webScrapper.createDB(database,'content')
     

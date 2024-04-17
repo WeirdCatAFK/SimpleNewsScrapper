@@ -3,12 +3,16 @@ import time, sqlite3, math
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
+driver_path = None
 
-driver_path = r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
 
+def set_DriverPath(path:str):
+    global driver_path
+    driver_path = path
 
 def getSearchResults(query: str) -> list:
-    brave_path = "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
+    global driver_path
+    brave_path = driver_path
 
     option = webdriver.ChromeOptions()
 

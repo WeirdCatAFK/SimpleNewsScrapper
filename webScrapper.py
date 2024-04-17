@@ -7,7 +7,12 @@ import random, time, sqlite3, re
 
 filterClasses = ["kicker-aside-back", "kicker"]
 
-driver_path = r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
+driver_path = None
+
+def set_DriverPath(path:str):
+    global driver_path
+    driver_path = path
+
 
 def depurer(text):
     # Function to remove newlines
