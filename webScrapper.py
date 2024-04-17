@@ -33,7 +33,8 @@ def depurer(text):
 
 def getHtmlText(url):
     try:
-        brave_path = "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
+        global driver_path
+        brave_path = driver_path
 
         option = webdriver.ChromeOptions()
 
