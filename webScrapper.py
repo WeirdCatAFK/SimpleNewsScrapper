@@ -2,14 +2,27 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import WebDriverException, TimeoutException
 from bs4 import BeautifulSoup
-import random, time, sqlite3
+import random, time, sqlite3, re
 
 
 filterClasses = ["kicker-aside-back", "kicker"]
 
 
-def deleteNewLines(text):
-    return text.replace("\n", "")
+def depurer(text):
+    # Function to remove newlines
+    def deleteNewLines(text):
+        return text.replace("\n", "")
+
+    # Remove newlines
+    text = deleteNewLines(text)
+    
+    # Remove anything between curly braces
+    text = re.sub(r'\{[^\}]*\}', '', text)
+    
+    # Remove anything between square brackets
+    text = re.sub(r'\[[^\]]*\]', '', text)
+    
+    return text
 
 
 def getHtmlText(url):
@@ -46,10 +59,10 @@ def getHtmlText(url):
             if tag.parent.name not in ["head", "script"] and not any(
                 cls in tag.get("class", []) for cls in filterClasses
             ):  # Exclude <head>, <script>, and elements with specific classes
-                paragraphs.append(deleteNewLines(str(tag.text)))
+                paragraphs.append(depurer(str(tag.text)))
         # Data processing
         for tag in paragraphs[0:20]:
-            output += deleteNewLines(tag) + " "
+            output += depurer(tag) + " "
         driver.quit()
         return output
 

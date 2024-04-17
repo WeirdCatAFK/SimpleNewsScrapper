@@ -18,11 +18,10 @@ def main():
 
     #Creamos la base de datos para el contenido de las noticias
     webScrapper.createDB(database,'content')
-    #Insertamos las noticias a la base de datos
-    for new in news:
-        print (f"retrieved {new} from database")
-    
-    webScrapper.writeTextToDB(database,'content',webScrapper.getHtmlText(str(new[1])))
+    #Insertamos el contenido de las noticias a la base de datos
+    for news in urls:
+        print (f"retrieved {news} from database")
+        webScrapper.writeTextToDB(database,'content',webScrapper.getHtmlText(str(news[1])))
 
 if __name__ == "__main__":
     main()
