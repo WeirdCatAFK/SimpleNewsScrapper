@@ -1,14 +1,19 @@
-import time, sqlite3
+import time, sqlite3, math
 
 from selenium import webdriver
 from bs4 import BeautifulSoup
 
 
+driver_path = r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
 
 
 def getSearchResults(query: str) -> list:
-    driver = webdriver.Firefox()
+    brave_path = "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
 
+    option = webdriver.ChromeOptions()
+
+    option.binary_location = brave_path
+    driver = webdriver.Chrome(options = option)
     try:
         # Abrir la URL en el navegador
         driver.get("https://www.bing.com/news/search?q=" + query)
@@ -82,3 +87,43 @@ def getResultsFromDatabase(sqliteDB_Path: str, tableName: str):
     connection.close()
 
     return results
+
+def distributeDataEqually(sqliteDB_Path, tableName: str, num_files: int):
+    try:
+        # Connect to the original database
+        conn = sqlite3.connect(sqliteDB_Path)
+        cursor = conn.cursor()
+
+        # Retrieve data from the original database
+        cursor.execute(f"SELECT * FROM {tableName}")
+        data = cursor.fetchall()
+
+        # Split the data into equal parts
+        chunk_size = math.ceil(len(data) / num_files)
+        chunks = [data[i:i+chunk_size] for i in range(0, len(data), chunk_size)]
+
+        # Write each chunk to a new database file
+        for i, chunk in enumerate(chunks):
+            new_sqliteDB_Path = f"database_part_{i}.db"
+            conn_new = sqlite3.connect(new_sqliteDB_Path)
+            cursor_new = conn_new.cursor()
+
+            # Create a table with the same schema as the original
+            cursor_new.execute(f"CREATE TABLE IF NOT EXISTS {tableName} (id INTEGER NOT NULL UNIQUE, urls TEXT UNIQUE, PRIMARY KEY(id AUTOINCREMENT))")
+
+            # Insert data into the new table
+            for row in chunk:
+                try:
+                    cursor_new.execute("INSERT INTO YourTableName (urls) VALUES (?)", (row[1],))
+                except sqlite3.IntegrityError:
+                    print(f"Skipping duplicate entry: {row[1]}")
+
+            conn_new.commit()
+            conn_new.close()
+
+        print(f"Data distributed equally among {num_files} new database files.")
+
+    except sqlite3.Error as e:
+        print("SQLite error:", e)
+    finally:
+        conn.close()

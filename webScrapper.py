@@ -7,6 +7,7 @@ import random, time, sqlite3, re
 
 filterClasses = ["kicker-aside-back", "kicker"]
 
+driver_path = r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe"
 
 def depurer(text):
     # Function to remove newlines
@@ -27,7 +28,14 @@ def depurer(text):
 
 def getHtmlText(url):
     try:
-        driver = webdriver.Firefox()
+        brave_path = "C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
+
+        option = webdriver.ChromeOptions()
+
+        option.binary_location = brave_path
+
+        driver = webdriver.Chrome(executable_path=driver_path, chrome_options=option)
+
 
         # Configurar el tiempo máximo de espera para cargar la página
         driver.set_page_load_timeout(20)
@@ -90,18 +98,13 @@ def writeTextToDB(sqliteDB_Path: str, tableName: str, url: str, entryText: str):
     connection = sqlite3.connect(sqliteDB_Path)
     cursor = connection.cursor()
 
-    # Verificar si el texto ya existe en la tabla
-    cursor.execute(f"SELECT text FROM {tableName} WHERE text = ?", (entryText,))
-    existing_data = cursor.fetchone()
-    if existing_data:
-        print(
-            f"El texto '{entryText}' ya existe en la tabla. No se insertará nuevamente."
-        )
-    else:
+    try:
         cursor.execute(
             f"INSERT INTO {tableName} (url, text) VALUES (?, ?)", (url, entryText)
         )
-        print(f"El dato '{entryText}' se inserto exitosamente a la base de datos.")
+        print(f"El dato '{entryText}' se insertó exitosamente a la base de datos.")
+    except sqlite3.IntegrityError:
+        print(f"El URL '{url}' ya existe en la tabla. No se insertará nuevamente.")
 
     connection.commit()
     connection.close()
