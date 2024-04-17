@@ -1,5 +1,6 @@
-import newsSearcher, webScrapper, os
-
+import newsSearcher
+import webScrapper
+import os
 
 def main():
     database = 'data.db'
@@ -28,7 +29,7 @@ def main():
         # Write the current batch of news URLs to the database
         newsSearcher.writeResultsToDatabase(database, 'searchResults', news_urls)
         
-        #Create the table where we will store our content
+        # Create the table where we will store our content
         webScrapper.createDB(database,'content')
         
         # Process news URLs in batches
@@ -41,6 +42,9 @@ def main():
                 webScrapper.writeTextToDB(database, 'content',str(news_url), webScrapper.getHtmlText(str(news_url)))
                 # Append the news URL to the list of all news
                 all_the_news.append(news_url)
+            
+            # Close database connection after processing each batch
+            webScrapper.getContentFromDB(database, 'content')
     
     # Confirm that the data is in the database
     urls = newsSearcher.getResultsFromDatabase(database, 'searchResults')
@@ -48,4 +52,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

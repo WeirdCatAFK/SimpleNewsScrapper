@@ -51,24 +51,25 @@ def getHtmlText(url):
         # Parsear el HTML a un soup de bs4 directamente desde el navegador
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        # Data filtering
+        # Data filtering and processing
         output = ""
-        paragraphs = []
+        paragraphs_count = 0
         for tag in soup.find_all(["p"]):
             if tag.parent.name not in ["head", "script"] and not any(
                 cls in tag.get("class", []) for cls in filterClasses
             ):  # Exclude <head>, <script>, and elements with specific classes
-                paragraphs.append(depurer(str(tag.text)))
-
-        # Data processing
-        for tag in paragraphs[0:20]:
-            output += depurer(tag) + " "
+                text = depurer(str(tag.text))
+                output += text + " "
+                paragraphs_count += 1
+                if paragraphs_count >= 20:
+                    break
 
         driver.quit()
         return output
 
     except (WebDriverException, TimeoutException) as e:
-        driver.quit()
+        if 'driver' in locals() and driver:
+            driver.quit()
         print("Error:", e)
         return ""
 
