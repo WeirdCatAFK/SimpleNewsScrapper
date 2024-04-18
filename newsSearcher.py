@@ -14,10 +14,12 @@ def getSearchResults(query: str) -> list:
     global driver_path
     brave_path = driver_path
 
-    option = webdriver.ChromeOptions()
+    options = webdriver.ChromeOptions()
+    options.add_argument('--enable-chrome-browser-cloud-management')
+    options.add_argument(    "--disable-extensions")
 
-    option.binary_location = brave_path
-    driver = webdriver.Chrome(options = option)
+    options.binary_location = brave_path
+    driver = webdriver.Chrome(options = options)
     try:
         # Abrir la URL en el navegador
         driver.get("https://www.bing.com/news/search?q=" + query)

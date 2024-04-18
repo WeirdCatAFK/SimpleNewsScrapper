@@ -57,7 +57,7 @@ def getHtmlText(url):
             time.sleep(random.uniform(1, 3))
             newHeight = driver.execute_script("return document.body.scrollHeight")
             now = time.time()
-            if newHeight == lastHeight or (now - start) >= 20:
+            if newHeight == lastHeight or (now - start) >= 60:
                 break
             lastHeight = newHeight
 
