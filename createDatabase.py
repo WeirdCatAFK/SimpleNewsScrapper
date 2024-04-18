@@ -10,8 +10,8 @@ def main():
     webScrapper.set_DriverPath(
         r"C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe"
     )  # Tu path de tu ejecutable de brave
-    
-    database = "data.db"    #El nombre de tu base de datos de salida
+
+    database = "data.db"  # El nombre de tu base de datos de salida
     if not os.path.exists(database):
         with open(database, "w"):
             pass
@@ -19,37 +19,35 @@ def main():
 
     # Determine our queries
     search_queries = [
-        "Asaltos a camiones de carga en",
-        "Robos a camiones de transporte de mercancías en",
-        "Incidentes de robo a mano armada a camiones en",
-        "Noticias sobre bandas criminales que roban camiones en",
-        "Casos destacados de asaltos a camiones en zonas urbanas en",
-        "Aumento de robos a camiones en",
-        "Respuesta de las autoridades ante el aumento de asaltos a camiones en",
-        "Impacto económico de los robos a camiones en la industria del transporte en",
-        "Carreteras Peligrosas en",
-        "Robos a mano armada en carreteras principales en",
-        "Casos de secuestros exprés en carreteras transitadas en",
-        "Falsos retenes en",
-        "Incidentes de vandalismo en vehículos en",
-        "Asaltos a camiones de carga durante la noche en",
-        "Robos a camiones de transporte de mercancías durante el día en",
-        "Incidentes de robo a mano armada a camiones en autopistas en",
-        "Noticias sobre bandas criminales que roban camiones en áreas rurales en",
-        "Casos destacados de asaltos a camiones en zonas industriales en",
-        "Aumento de robos a camiones en áreas metropolitanas en",
-        "Respuesta de las autoridades ante el aumento de asaltos a camiones en regiones fronterizas en",
-        "Impacto económico de los robos a camiones en la cadena de suministro en",
-        "Carreteras Peligrosas en días festivos en",
-        "Robos a mano armada en carreteras secundarias en días laborables en",
-        "Casos de secuestros exprés en carreteras aisladas en fines de semana en",
-        "Falsos retenes en áreas de construcción en",
-        "Incidentes de vandalismo en vehículos de carga en",
-        "Asaltos a camiones de carga con violencia en",
-        "Robos a camiones de transporte de mercancías con intimidación en",
-        "Incidentes de robo a mano armada a camiones con toma de rehenes en",
-        "Noticias sobre bandas criminales que roban camiones con armas de fuego en",
-        "Casos destacados de asaltos a camiones en áreas de descanso en",
+        "Seguridad en camiones en",
+        "Problemas de seguridad en transporte en",
+        "Violencia contra camiones en",
+        "Crimen en carreteras relacionadas con camiones en",
+        "Delitos en camiones en",
+        "Riesgos para camiones en",
+        "Seguridad vial para camiones en",
+        "Desafíos de seguridad en transporte en",
+        "Crimen en carreteras principales en",
+        "Robos y asaltos en carreteras en",
+        "Incidencias criminales en carreteras en",
+        "Seguridad en carreteras en",
+        "Problemas de seguridad en vehículos en",
+        "Robos y asaltos en vehículos en",
+        "Incidencias criminales en autopistas en",
+        "Desafíos de seguridad en áreas rurales en",
+        "Riesgos de seguridad en zonas industriales en",
+        "Seguridad en áreas metropolitanas en",
+        "Crimen en regiones fronterizas en",
+        "Desafíos de seguridad en cadena de suministro en",
+        "Seguridad en carreteras durante días festivos en",
+        "Riesgos de seguridad en carreteras secundarias en",
+        "Incidencias criminales en carreteras aisladas en",
+        "Seguridad en áreas de construcción en",
+        "Problemas de seguridad en vehículos de carga en",
+        "Delitos violentos contra camiones en",
+        "Amenazas de seguridad para camiones en",
+        "Crimen organizado contra camiones en",
+        "Incidencias criminales en áreas de descanso en",
     ]
 
     # Initialize an empty list to store all news
@@ -64,10 +62,11 @@ def main():
         news_urls = newsSearcher.getSearchResults(query)
 
         # Write the current batch of news URLs to the database
-        newsSearcher.writeResultsToDatabase(database, "searchResults", news_urls)
+        newsSearcher.insertDataIntoDatabase(database, "searchResults", news_urls)
 
     # Create the table where we will store our content
     webScrapper.createDB(database, "content")
+    newsSearcher.createDatabase(database, "searchResults")
 
     # Process news URLs in batches
     for i in range(0, len(news_urls), batch_size):

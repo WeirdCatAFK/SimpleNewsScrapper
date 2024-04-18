@@ -45,8 +45,7 @@ def getSearchResults(query: str) -> list:
 
     return results
 
-    
-def writeResultsToDatabase(sqliteDB_Path: str, tableName: str, data: list):
+def createDB(sqliteDB_Path: str, tableName: str):
     connection = sqlite3.connect(sqliteDB_Path)
     cursor = connection.cursor()
     
@@ -56,6 +55,13 @@ def writeResultsToDatabase(sqliteDB_Path: str, tableName: str, data: list):
                    "\t\"urls\" TEXT UNIQUE,\n"
                    "\tPRIMARY KEY(\"id\" AUTOINCREMENT)\n"
                    ");")
+    
+    connection.commit()
+    connection.close()
+    
+def insertDataIntoDatabase(sqliteDB_Path: str, tableName: str, data: list):
+    connection = sqlite3.connect(sqliteDB_Path)
+    cursor = connection.cursor()
     
     try:
         # Iniciar transacción
@@ -69,7 +75,7 @@ def writeResultsToDatabase(sqliteDB_Path: str, tableName: str, data: list):
                 print(f"El dato '{content}' ya existe en la tabla. No se insertará nuevamente.")
             else:
                 cursor.execute(f"INSERT INTO {tableName}(urls) VALUES (?)", (content,))
-                print(f"El dato '{content}' se inserto exitosamente a la base de datos.")
+                print(f"El dato '{content}' se insertó exitosamente en la base de datos.")
         
         # Finalizar transacción
         connection.commit()
