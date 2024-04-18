@@ -67,20 +67,16 @@ def main():
         # Write the current batch of news URLs to the database
         newsSearcher.insertDataIntoDatabase(database, "searchResults", news_urls)
 
-    # Process news URLs in batches
-    for i in range(0, len(news_urls), batch_size):
-        batch_urls = news_urls[i : i + batch_size]
-        print(
-            f"Processing batch {i // batch_size + 1} of {len(news_urls) // batch_size + 1}"
-        )
-        for news_url in batch_urls:
-            print(f"Retrieving {news_url} from database")
+    news = []
+    for entry in newsSearcher.getResultsFromDatabase(database, "searchResults"):
+        news.append(entry[1])
+
+    for i, entry in enumerate(news):
+        print(f'Getting content from  entry no {i} ')
             # Fetch and write the content of the current news URL to the database
-            webScrapper.writeTextToDB(
-                database, "content", str(news_url), webScrapper.getHtmlText(news_url)
-            )
-            # Append the news URL to the list of all news
-            all_the_news.append(news_url)
+        webScrapper.writeTextToDB(
+            database, "content", str(entry), webScrapper.getHtmlText(entry)
+        )
 
         # Close database connection after processing each batch
         webScrapper.getContentFromDB(database, "content")
