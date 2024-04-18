@@ -93,10 +93,11 @@ def createDB(sqliteDB_Path: str, tableName: str):
 
     cursor.execute("DROP TABLE IF EXISTS " + tableName + ";")
     cursor.execute(
-        f'CREATE TABLE "{tableName}" (\n\t"id"\tINTEGER NOT NULL UNIQUE,\n\t"url"\tTEXT UNIQUE,\n\t"text"\tTEXT,\n\tPRIMARY KEY("id")\n);'
+        f'CREATE TABLE "{tableName}" (\n\t"id"\tINTEGER NOT NULL UNIQUE,\n\t"url"\tTEXT UNIQUE,\n\t"text"\tTEXT,\n\t"analisis"\tTEXT,\n\tPRIMARY KEY("id")\n);'
     )
     connection.commit()
     connection.close()
+
 
 
 def writeTextToDB(sqliteDB_Path: str, tableName: str, url: str, entryText: str):
