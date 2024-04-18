@@ -35,7 +35,33 @@ def getHtmlText(url):
     try:
         global driver_path
         brave_path = driver_path
+        options = webdriver.ChromeOptions()
+        options.add_argument('--enable-chrome-browser-cloud-management')
+        options.add_argument(    "--disable-extensions")
+        prefs = {"profile.managed_default_content_settings.images": 2}
+        options.add_experimental_option("prefs", prefs)
+        options.add_argument("--ignore-certificate-errors")
+        user_agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.75 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15; rv:100.0) Gecko/20100101 Firefox/100.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.79 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15; rv:100.0) Gecko/20100101 Firefox/100.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4896.79 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4896.79 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:101.0) Gecko/20100101 Firefox/101.0",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15; rv:101.0) Gecko/20100101 Firefox/101.0"
+    ]
 
+    # Randomly select a user-agent string from the list
+        random_user_agent = random.choice(user_agents)
+
+        # Set up Chrome options
+        options = webdriver.ChromeOptions()
+        options.add_argument(f"user-agent={random_user_agent}")
         option = webdriver.ChromeOptions()
 
         option.binary_location = brave_path
